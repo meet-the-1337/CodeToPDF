@@ -1,173 +1,290 @@
-# Code to PDF Converter 🚀
+# Code to PDF 🚀
 
-A fast, local-first desktop app that turns code or text into clean, readable PDFs.  
-Built with performance, simplicity, and real-world usability in mind.
+A high-performance, local-first desktop application that converts source code and plain text into clean, readable, and beautifully formatted PDFs.
 
----
-
-## 🧠 How This App Thinks (Core Idea)
-
-User gives input → system understands type → applies minimal styling → outputs readable PDF fast.
-
-Flow:
-
-[User Input]  
-↓  
-[Detect: File OR Pasted Text]  
-↓  
-[Is Code?]  
-↙        ↘  
-[Yes]      [No]  
-↓           ↓  
-[Syntax]   [Plain Text Styling]  
-[Highlight]  
-↓  
-[Font + Background Applied]  
-↓  
-[Chunk Processing (for large files)]  
-↓  
-[PDF Generated in Memory]  
-↓  
-[Saved Locally]
+This project is built not just as a tool, but as a **thinking system** — focused on solving problems with clarity, speed, and simplicity.
 
 ---
 
-## ⚙️ System Design Flow
+## ⚡ Quick Start
 
-[GUI (PyQt6)]  
-↓  
-[Input Handler]  
-↓  
-[Engine (code_to_pdf_engine.py)]  
-↓  
-[Pygments → Language + Tokens]  
-↓  
-[ReportLab → PDF Builder]  
-↓  
-[BytesIO Buffer]  
-↓  
-[Final PDF Output]
+1. Download from GitHub Releases
 
----
+2. Run:
 
-## 🧩 Problem Solving Approach
+Linux (AppImage)
+chmod +x code-to-pdf.AppImage && ./code-to-pdf.AppImage
 
-This app is built on a simple belief:
+Linux (.deb)
+sudo apt install ./code-to-pdf_1.0.0_amd64.deb
 
-Small problems → clear steps → efficient solution
+Windows
+Run code-to-pdf-windows.exe
 
-Example problem:  
-“Convert messy code into readable format”
+macOS
+Open code-to-pdf-macos.dmg → drag app → run
 
-Solution thinking:  
-1. Identify input type  
-2. Reduce complexity (no heavy styling)  
-3. Keep processing local  
-4. Optimize only where needed  
-5. Deliver fast output  
+3. Open app → Select file or paste code → Generate PDF
 
 ---
 
-## 🔁 Internal Processing Logic
+## 🧠 Core Vision
 
-Step 1: Input received  
-Step 2: Mode selected (file / paste)  
-Step 3: Language guessed  
-Step 4: Tokens generated  
-Step 5: Styles applied  
-Step 6: Content chunked  
-Step 7: PDF built in memory  
-Step 8: Output saved  
+This app is built on a simple principle:
+
+Problem → Structure → Flow → Execution → Output
+
+You are not building features.  
+You are building **clear thinking systems**.
 
 ---
 
-## ⚡ Performance Philosophy
+## 🧠 Problem Being Solved
 
-- Avoid unnecessary work  
-- Cache everything reusable  
-- Never block UI  
-- Never use disk if memory works  
+Raw code is:
+- Hard to read
+- Poorly formatted
+- Not presentation-ready
 
-Result:
-- < 0.5s generation  
-- < 150MB peak RAM  
-- 0 temp files  
+Goal:
+Convert it into a **clean, structured, readable PDF** with minimal effort.
 
 ---
 
-## 🧪 Example Flow (Real Use)
+## 🔁 High-Level Flow
 
-Input: `main.cpp`  
-
-→ detected as C++  
-→ keywords colored  
-→ formatted into blocks  
-→ rendered into PDF  
-→ saved as `main_code_to_pdf.pdf`  
-
----
-
-## 🎯 Design Principles
-
-- Local-first (no internet ever)  
-- Fast over fancy  
-- Simple UI > complex features  
-- Predictable output  
-- Minimal clicks  
+User Input
+↓
+Detect Input Type
+↓
+Detect Language
+↓
+Apply Formatting
+↓
+Optimize Processing
+↓
+Generate PDF
+↓
+Save Output
 
 ---
 
-## 🚀 Your Bigger Vision
+## 🔄 Detailed Flowchart
 
-You’re not just building this app.
+[User Input]
+↓
+[File Selected OR Code Pasted]
+↓
+[Detect Language using Pygments]
+↓
+Is Code?
+→ Yes → Syntax Highlighting
+→ No → Plain Text Styling
+↓
+[Apply Font + Theme + Background]
+↓
+[Chunk Processing (for large inputs)]
+↓
+[Convert to PDF (ReportLab)]
+↓
+[Store in Memory (BytesIO)]
+↓
+[Write Final Output File]
 
-You’re learning:
+---
 
-- How to break problems  
-- How to design flow  
-- How to optimize thinking  
-- How to build tools people actually use  
+## ⚙️ System Architecture
 
-Future direction:
+GUI Layer (PyQt6)
+↓
+Input Controller
+↓
+Processing Engine
+↓
+Pygments (Tokenization + Highlighting)
+↓
+ReportLab (PDF Rendering)
+↓
+BytesIO (Memory Buffer)
+↓
+Output File
 
-[Problem]  
+---
+
+## 🔧 Internal Processing Steps
+
+1. Accept input (file or pasted text)  
+2. Identify language automatically  
+3. Tokenize content using Pygments  
+4. Map tokens to styles (colors/fonts)  
+5. Group lines into chunks (memory efficient)  
+6. Build PDF elements using ReportLab  
+7. Render into memory (no disk temp files)  
+8. Save final PDF  
+
+---
+
+## ⚡ Performance Design
+
+Key idea: **Do less, but do it efficiently**
+
+Strategies:
+
+- In-memory processing (BytesIO)
+- Font caching (avoid reloading fonts)
+- Style caching (avoid recomputation)
+- Chunk-based rendering (avoid memory spikes)
+- Background threads (no UI freeze)
+
+---
+
+## 📊 Performance Metrics
+
+Startup Time: ~130 ms  
+1000 Lines PDF: ~0.4 seconds  
+Cached Re-run: ~6 ms  
+Idle RAM: ~37 MB  
+Peak RAM: < 130 MB  
+Temp Disk Usage: 0  
+
+---
+
+## 🧪 Example Flow
+
+Input: main.cpp
+
+Step 1: Detect C++  
+Step 2: Apply syntax highlighting  
+Step 3: Format into structured layout  
+Step 4: Render into PDF  
+Step 5: Save as main_code.pdf  
+
+---
+
+## 🌐 Cross-Platform Strategy
+
+Single Codebase
+↓
+Multiple Build Targets
+
+Linux:
+- AppImage (portable)
+- .deb (Debian/Ubuntu)
+- .rpm (Fedora/openSUSE)
+
+Windows:
+- .exe (PyInstaller)
+
+macOS:
+- .dmg (native app bundle)
+
+---
+
+## 📦 Build & Distribution Flow
+
+Source Code
+↓
+PyInstaller Build
+↓
+Platform Packaging
+↓
+GitHub Actions CI/CD
+↓
+Release Assets
+↓
+User Download
+
+---
+
+## 🔁 User Journey
+
+Download App
+↓
+Run / Install
+↓
+Open Interface
+↓
+Paste or Select Code
+↓
+Click Generate
+↓
+Get PDF
+
+---
+
+## 🧠 Design Philosophy
+
+Simple Input  
 ↓  
-[Break into steps]  
+Clear Flow  
 ↓  
-[Design flow]  
-↓  
-[Build simple tool]  
-↓  
-[Optimize only when needed]  
+Fast Output  
 
-Repeat.
+Avoid:
+- Over-engineering  
+- Heavy UI  
+- Unnecessary features  
+
+---
+
+## 🧠 Your Thinking Model
+
+See Problem  
+↓  
+Break into Steps  
+↓  
+Design Flow  
+↓  
+Build Minimal Solution  
+↓  
+Optimize Later  
+
+This app is training that mindset.
+
+---
+
+## 🔭 Future Direction
+
+Real-world problems
+↓
+Flow-based solutions
+↓
+Minimal tools
+↓
+Fast execution
+↓
+Scalable thinking
 
 ---
 
 ## 📁 Project Structure
 
-CodeToPDF/  
-├── src/  
-│   ├── gui.py  
-│   ├── code_to_pdf_engine.py  
-├── dist/  
-│   └── code-to-pdf  
-├── assets/  
-│   └── icon.png  
-├── setup_shortcut.sh  
-├── code-to-pdf.desktop  
-├── README.md  
+CodeToPDF/
+├── src/
+│   ├── gui.py
+│   ├── code_to_pdf_engine.py
+├── assets/
+├── .github/workflows/
+├── build scripts
+├── README.md
 
 ---
 
 ## 🧠 Mental Model
 
-Don’t think:  
-“Build big apps”
+Don't think:
+"Build complex apps"
 
-Think:  
-“Solve one clear problem cleanly”
+Think:
+"Solve one problem clearly"
 
 ---
 
-## ⚡ Run App
+## 🔚 Final Thought
+
+If it is:
+- Fast
+- Simple
+- Predictable
+
+Then it is correct.
