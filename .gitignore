@@ -2,6 +2,7 @@ build/
 __pycache__/
 *.pyc
 *.spec
+!buildozer.spec
 dist/
 AppDir/
 appimagetool
