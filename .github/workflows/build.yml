@@ -39,7 +39,7 @@ jobs:
           wget -q https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage -O appimagetool
           chmod +x appimagetool
           ./build_appimage.sh
-          ./appimagetool AppDir code-to-pdf.AppImage
+          ARCH=x86_64 ./appimagetool --appimage-extract-and-run AppDir code-to-pdf.AppImage
 
       - name: Build RPM (.rpm) Package
         run: |

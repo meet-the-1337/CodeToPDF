@@ -53,7 +53,7 @@ chmod +x "${APP_DIR}/AppRun"
 
 # Check appimagetool availability
 if command -v appimagetool >/dev/null 2>&1; then
-    appimagetool "${APP_DIR}" "${APPIMAGE_OUTPUT}"
+    ARCH=x86_64 appimagetool --appimage-extract-and-run "${APP_DIR}" "${APPIMAGE_OUTPUT}"
     echo "✓ AppImage generated successfully: ${APPIMAGE_OUTPUT}"
 else
     echo "⚠️ appimagetool not found on host. AppDir structure prepared in AppDir/."
