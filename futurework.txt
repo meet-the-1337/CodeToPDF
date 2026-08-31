@@ -1,0 +1,82 @@
+Prompt A — Build Debian package (.deb) and attach to release
+
+Create a Debian package for the existing code-to-pdf Linux binary and attach it to GitHub Releases. Steps:
+1) Create a packaging folder debpkg/DEBIAN and debpkg/usr/local/bin.
+2) Copy the built Linux executable into debpkg/usr/local/bin/code-to-pdf and set executable permissions.
+3) Create debpkg/DEBIAN/control with fields: Package (code-to-pdf), Version (v1.0.0), Section (utils), Priority (optional), Architecture (amd64), Maintainer (Your Name <you@example.com>), Description (short description).
+4) Optionally add postinst script to create desktop file in /usr/share/applications and set permissions.
+5) Build .deb using dpkg-deb --build debpkg code-to-pdf-v1.0.0.deb.
+6) Verify install locally with sudo apt install ./code-to-pdf-v1.0.0.deb and uninstall via sudo apt remove code-to-pdf.
+7) In GitHub Actions build workflow, after generating code-to-pdf-linux, add steps to create the .deb and upload it as release asset named code-to-pdf_1.0.0_amd64.deb.
+Return: packaging scripts, control file contents, and updated build.yml snippet that produces and uploads the .deb.
+
+Prompt B — Build AppImage (portable Linux single file)
+
+Create an AppImage for the Linux binary so users can run on many distros without installing. Steps:
+1) Create an AppDir structure (AppDir/usr/bin) and copy code-to-pdf binary into usr/bin.
+2) Add AppRun wrapper that execs usr/bin/code-to-pdf.
+3) Add desktop file and icon under AppDir/.
+4) Use appimagetool to produce CodeToPDF-x86_64.AppImage.
+5) Add AppImage creation to GitHub Actions and attach artifact named code-to-pdf.AppImage.
+Return: AppDir layout, AppRun script, and workflow snippet to build and upload AppImage.
+
+Prompt C — Add RPM package (optional for Fedora/openSUSE)
+
+Create an RPM package (code-to-pdf-1.0.0.x86_64.rpm) using fpm or rpmbuild. Steps:
+1) Install fpm in CI container.
+2) Use fpm -s dir -t rpm to package /usr/local/bin/code-to-pdf with spec metadata.
+3) Upload RPM as release asset for Fedora/openSUSE users.
+Return: fpm command and GitHub Actions snippet that creates and uploads RPM.
+
+Prompt D — Add Windows installer (NSIS) and macOS installer (.dmg or .pkg)
+
+For Windows:
+1) Use PyInstaller to build code-to-pdf.exe.
+2) Use NSIS script (makensis) to create installer .exe (adds Start Menu shortcut and optional desktop icon).
+3) Add NSIS packaging in Windows job on GitHub Actions and upload code-to-pdf-setup.exe.
+
+For macOS:
+1) Build macOS binary via pyinstaller or python build.
+2) Create a .dmg or .pkg using hdiutil / productbuild steps on macOS runner.
+3) Upload dmg/pkg as release asset.
+
+Return: NSIS script and macOS packaging steps for the workflow.
+
+Prompt E — Update GitHub Actions to build installers and attach assets
+
+Update .github/workflows/build.yml to:
+1) Run matrix jobs for linux/windows/macos.
+2) For Linux job: after building code-to-pdf-linux, run AppImage creation, .deb creation, and optionally RPM creation; upload all artifacts using actions/upload-release-asset or upload-artifact then release uploader.
+3) For Windows job: create code-to-pdf.exe and NSIS installer and upload both.
+4) For macOS job: build macOS binary and create .dmg/.pkg and upload.
+5) Ensure workflow triggers only on tag push and the release action uses created artifacts as assets.
+Return: full workflow YAML that outputs multiple installer assets and attaches them to the release.
+
+Prompt F — Add user-facing install instructions to README
+
+Add short install instructions under Releases section to explain how to install each artifact:
+- Linux .deb: sudo apt install ./code-to-pdf_1.0.0_amd64.deb
+- AppImage: chmod +x code-to-pdf.AppImage && ./code-to-pdf.AppImage
+- RPM: sudo dnf install ./code-to-pdf-1.0.0.x86_64.rpm
+- Windows EXE: run setup .exe and follow installer
+- macOS DMG: open and drag app to /Applications
+Also add verification checksums (sha256) next to each asset.
+Return: README snippet to paste into Releases notes.
+
+Notes & guidance (short)
+
+.deb requires user confirmation (sudo) — normal and expected. You cannot bypass that.
+AppImage is frictionless for most Linux users — good fallback if you want “no install” option.
+Uploading many installers is fine; users will pick the one for their OS.
+Add checksums to release notes so users verify downloads.
+In CI, ensure you sign or set appropriate permissions for macOS and Windows artifacts if you plan to distribute widely.
+
+Prompt G — Build Android Package (.apk) for Phone and attach to release
+
+1) Create src/mobile_gui.py and main.py for Kivy touch-optimized mobile phone interface.
+2) Create buildozer.spec for Android APK configuration (Python 3, Kivy, ReportLab, Pygments).
+3) Create build_android.sh build script.
+4) Update .github/workflows/build.yml to add build-android job and attach code-to-pdf-android.apk to release assets.
+5) Update README.md with Android installation steps.
+
+Status: COMPLETED. All platforms (Linux AppImage/.deb/.rpm, Windows .exe, macOS .dmg, Android .apk) are now integrated into automated release flow.

@@ -24,6 +24,9 @@ Run code-to-pdf-windows.exe
 macOS
 Open code-to-pdf-macos.dmg → drag app → run
 
+Android (Phone)
+Install code-to-pdf-android.apk → Open & Generate PDF
+
 3. Open app → Select file or paste code → Generate PDF
 
 ---
@@ -177,6 +180,9 @@ Windows:
 
 macOS:
 - .dmg (native app bundle)
+
+Android (Phone):
+- .apk (Buildozer / Kivy touch mobile app)
 
 ---
 
