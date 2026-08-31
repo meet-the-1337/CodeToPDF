@@ -1,25 +1,70 @@
-name: Release Cross-Platform Executables
+name: Build & Release Cross-Platform Installers
 
 on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
 
 jobs:
-  build-release:
-    name: Build & Attach Release Binary (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-            asset_name: code-to-pdf-linux
-          - os: windows-latest
-            asset_name: code-to-pdf.exe
-          - os: macos-latest
-            asset_name: code-to-pdf-macos
+  build-linux:
+    name: Build Linux Assets (.deb, .AppImage, .rpm)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Build Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dpkg-dev rpm wget fuse
+          python -m pip install --upgrade pip
+          pip install PyQt6 reportlab pygments pyinstaller
+
+      - name: Build Standalone Linux Binary
+        run: |
+          ./build_linux.sh
+
+      - name: Build Debian (.deb) Package
+        run: |
+          ./build_deb.sh
+
+      - name: Build AppImage (.AppImage)
+        run: |
+          wget -q https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage -O appimagetool
+          chmod +x appimagetool
+          ./build_appimage.sh
+          ./appimagetool AppDir code-to-pdf.AppImage
+
+      - name: Build RPM (.rpm) Package
+        run: |
+          mkdir -p rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+          mkdir -p rpmroot/usr/local/bin rpmroot/usr/share/applications rpmroot/usr/share/icons/hicolor/256x256/apps
+          cp dist/code-to-pdf rpmroot/usr/local/bin/
+          cp assets/icon.png rpmroot/usr/share/icons/hicolor/256x256/apps/code-to-pdf.png
+          cp code-to-pdf.desktop rpmroot/usr/share/applications/
+          sudo apt-get install -y ruby ruby-dev rubygems build-essential
+          sudo gem install --no-document fpm
+          fpm -s dir -t rpm -n code-to-pdf -v 1.0.0 -C rpmroot usr/local/bin usr/share
+
+      - name: Upload Linux Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-assets
+          path: |
+            dist/code-to-pdf
+            code-to-pdf_1.0.0_amd64.deb
+            code-to-pdf.AppImage
+            code-to-pdf-1.0.0-1.x86_64.rpm
+
+  build-windows:
+    name: Build Windows Assets (.exe)
+    runs-on: windows-latest
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
@@ -34,35 +79,89 @@ jobs:
           python -m pip install --upgrade pip
           pip install PyQt6 reportlab pygments pyinstaller
 
-      - name: Build Executable (Linux / macOS)
-        if: runner.os != 'Windows'
+      - name: Build Windows Executable
         run: |
-          pyinstaller --noconfirm --clean --onefile --windowed \
-            --name code-to-pdf \
-            --hidden-import=pygments.lexers \
-            --hidden-import=pygments.styles \
-            --hidden-import=reportlab \
-            --hidden-import=PyQt6.QtNetwork \
-            --add-data "assets/icon.png:assets" \
-            src/gui.py
-          mv dist/code-to-pdf dist/${{ matrix.asset_name }}
+          ./build_windows.bat
 
-      - name: Build Executable (Windows)
-        if: runner.os == 'Windows'
+      - name: Upload Windows Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-assets
+          path: dist/code-to-pdf-windows.exe
+
+  build-macos:
+    name: Build macOS Assets (.dmg)
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
         run: |
-          pyinstaller --noconfirm --clean --onefile --windowed `
-            --name code-to-pdf `
-            --hidden-import=pygments.lexers `
-            --hidden-import=pygments.styles `
-            --hidden-import=reportlab `
-            --hidden-import=PyQt6.QtNetwork `
-            --add-data "assets/icon.png;assets" `
-            src/gui.py
-          Rename-Item -Path "dist\code-to-pdf.exe" -NewName "${{ matrix.asset_name }}"
+          python -m pip install --upgrade pip
+          pip install PyQt6 reportlab pygments pyinstaller
 
-      - name: Attach Asset to Release
+      - name: Build macOS Executable
+        run: |
+          ./build_macos.sh
+
+      - name: Package macOS DMG Disk Image
+        run: |
+          mkdir dmg_root
+          cp dist/code-to-pdf-macos dmg_root/CodeToPDF
+          hdiutil create -volname "Code to PDF" -srcfolder dmg_root -ov -format UDZO code-to-pdf-macos.dmg
+
+      - name: Upload macOS Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-assets
+          path: code-to-pdf-macos.dmg
+
+  release:
+    name: Publish All Release Assets
+    needs: [build-linux, build-windows, build-macos]
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Linux Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-assets
+          path: ./release_assets
+
+      - name: Download Windows Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-assets
+          path: ./release_assets
+
+      - name: Download macOS Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-assets
+          path: ./release_assets
+
+      - name: Generate SHA256 Checksums
+        run: |
+          cd ./release_assets
+          sha256sum * > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/${{ matrix.asset_name }}
+          files: |
+            ./release_assets/code-to-pdf
+            ./release_assets/code-to-pdf_1.0.0_amd64.deb
+            ./release_assets/code-to-pdf.AppImage
+            ./release_assets/code-to-pdf-1.0.0-1.x86_64.rpm
+            ./release_assets/code-to-pdf-windows.exe
+            ./release_assets/code-to-pdf-macos.dmg
+            ./release_assets/SHA256SUMS.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -6,7 +6,7 @@ A high-performance, local-first desktop application that converts source code an
 
 ## ✨ Key Features
 
-- **Cross-Platform**: Native builds for Windows (`.exe`), macOS (`.app` / binary), and Linux (AppImage & Executable).
+- **Cross-Platform Installers**: Direct downloads for `.deb`, `.AppImage`, `.rpm`, `.exe`, and `.dmg`.
 - **Dual Input Modes**: Supports file selection (`.py`, `.c`, `.cpp`, `.java`, `.txt`, `.js`, `.html`, `.json`, `.sql`) OR direct code pasting via built-in editor.
 - **Pygments Syntax Highlighting**: Automatic language detection with fallback to clean plain text rendering.
 - **Offline & Local-First**: 100% offline generation with 0 external API calls or telemetry.
@@ -18,73 +18,71 @@ A high-performance, local-first desktop application that converts source code an
 
 ---
 
-## ⚡ Quick Start & Desktop Integration
+## 📥 Installation Instructions
 
-### Linux (Debian, Ubuntu, Arch, Fedora, Mint, CachyOS)
+### 🐧 Linux
+
+#### 1. Debian / Ubuntu / Linux Mint (`.deb`)
 ```bash
-# 1. Run standalone binary
-./dist/code-to-pdf
-
-# 2. Desktop Integration (.desktop launcher)
-cp code-to-pdf.desktop ~/.local/share/applications/
-cp code-to-pdf.desktop ~/Desktop/
-chmod +x ~/.local/share/applications/code-to-pdf.desktop ~/Desktop/code-to-pdf.desktop
-
-# 3. Global Keyboard Shortcut Setup (Super + Alt + C)
-./setup_shortcut.sh
+sudo apt install ./code-to-pdf_1.0.0_amd64.deb
 ```
 
-### Windows (10 / 11)
-```cmd
-code-to-pdf-windows.exe
+#### 2. Universal Portable AppImage (All Linux Distros)
+```bash
+chmod +x code-to-pdf.AppImage
+./code-to-pdf.AppImage
 ```
 
-### macOS (12+)
+#### 3. Fedora / RHEL / openSUSE (`.rpm`)
 ```bash
-./code-to-pdf-macos
+sudo dnf install ./code-to-pdf-1.0.0-1.x86_64.rpm
+```
+
+#### 4. Standalone Binary (CachyOS / Arch / Custom)
+```bash
+./code-to-pdf
 ```
 
 ---
 
-## 🤖 Automated GitHub Actions CI/CD Build & Releases
-
-When you push code or create a tag (`v1.0.0`) on GitHub, **GitHub Actions** automatically builds native executables for all 3 operating systems:
-
-- `code-to-pdf-linux-x86_64` (Linux - Ubuntu/Debian/Arch/Fedora/Mint)
-- `code-to-pdf-windows-x64.exe` (Windows 10/11)
-- `code-to-pdf-macos-x64` (macOS Intel & Apple Silicon)
-
-The workflow automatically attaches the compiled binaries directly to your **GitHub Release Downloads**!
+### 🪟 Windows (10 / 11)
+Download and run `code-to-pdf-windows.exe`.
 
 ---
 
-## 🛠️ Building Standalone Binaries Locally
+### 🍎 macOS (Intel & Apple Silicon)
+Download `code-to-pdf-macos.dmg`, double-click to open, and drag **CodeToPDF** to `/Applications`.
 
-### Linux
+---
+
+## 🔒 Checksum Verification (SHA256)
+
+To verify the integrity of your downloaded asset:
+
 ```bash
-./build_linux.sh
+sha256sum -c SHA256SUMS.txt
 ```
 
-### Windows
-```cmd
-build_windows.bat
-```
+---
 
-### macOS
-```bash
-./build_macos.sh
-```
+## 🛠️ Building Binaries Locally
+
+- **Linux Binary & Packaging**: `./build_linux.sh` | `./build_deb.sh` | `./build_appimage.sh`
+- **Windows Executable**: `build_windows.bat`
+- **macOS App**: `./build_macos.sh`
 
 ---
 
 ## 📄 File Overview
 
-- `code_to_pdf_engine.py`: Core styling, Pygments lexing, and ReportLab PDF engine.
-- `gui.py`: Lightweight PyQt6 desktop application with multi-tab input modes.
-- `.github/workflows/build.yml`: Automated cross-platform GitHub Actions build pipeline.
-- `build_linux.sh`: Standalone Linux build script.
-- `build_windows.bat`: Standalone Windows build script.
-- `build_macos.sh`: Standalone macOS build script.
+- `src/code_to_pdf_engine.py`: Core styling, Pygments lexing, and ReportLab PDF engine.
+- `src/gui.py`: Lightweight PyQt6 desktop application with multi-tab input modes.
+- `.github/workflows/build.yml`: Automated cross-platform GitHub Actions installer build pipeline.
+- `build_linux.sh`: Standalone Linux binary builder.
+- `build_deb.sh`: Debian `.deb` package builder.
+- `build_appimage.sh`: Universal Linux `.AppImage` builder.
+- `build_windows.bat`: Standalone Windows `.exe` builder.
+- `build_macos.sh`: Standalone macOS builder.
 - `code-to-pdf.desktop`: Desktop launcher integration template.
 - `setup_shortcut.sh`: Automatic global shortcut registration script.
 

@@ -3,6 +3,15 @@ __pycache__/
 *.pyc
 *.spec
 dist/
+AppDir/
+debpkg/
+rpmbuild/
+rpmroot/
+dmg_root/
+*.deb
+*.AppImage
+*.rpm
+*.dmg
 *.pdf
 .DS_Store
 *.tmp
