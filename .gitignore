@@ -1,0 +1,8 @@
+build/
+__pycache__/
+*.pyc
+*.spec
+dist/
+*.pdf
+.DS_Store
+*.tmp

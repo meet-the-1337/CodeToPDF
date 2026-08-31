@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Code to PDF
+Exec="/home/ms/all_projects/CodeToPDF/dist/code-to-pdf"
+Icon="/home/ms/all_projects/CodeToPDF/assets/icon.png"
+Type=Application
+Terminal=false
+Categories=Utility;
+Comment=Convert source code and text files into beautifully styled PDFs

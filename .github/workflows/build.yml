@@ -1,0 +1,68 @@
+name: Release Cross-Platform Executables
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-release:
+    name: Build & Attach Release Binary (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            asset_name: code-to-pdf-linux
+          - os: windows-latest
+            asset_name: code-to-pdf.exe
+          - os: macos-latest
+            asset_name: code-to-pdf-macos
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install PyQt6 reportlab pygments pyinstaller
+
+      - name: Build Executable (Linux / macOS)
+        if: runner.os != 'Windows'
+        run: |
+          pyinstaller --noconfirm --clean --onefile --windowed \
+            --name code-to-pdf \
+            --hidden-import=pygments.lexers \
+            --hidden-import=pygments.styles \
+            --hidden-import=reportlab \
+            --hidden-import=PyQt6.QtNetwork \
+            --add-data "assets/icon.png:assets" \
+            src/gui.py
+          mv dist/code-to-pdf dist/${{ matrix.asset_name }}
+
+      - name: Build Executable (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          pyinstaller --noconfirm --clean --onefile --windowed `
+            --name code-to-pdf `
+            --hidden-import=pygments.lexers `
+            --hidden-import=pygments.styles `
+            --hidden-import=reportlab `
+            --hidden-import=PyQt6.QtNetwork `
+            --add-data "assets/icon.png;assets" `
+            src/gui.py
+          Rename-Item -Path "dist\code-to-pdf.exe" -NewName "${{ matrix.asset_name }}"
+
+      - name: Attach Asset to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/${{ matrix.asset_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
